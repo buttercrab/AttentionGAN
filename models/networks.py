@@ -399,8 +399,9 @@ class ResnetGenerator_our(nn.Module):
 
 		self.resnet_blocks = []
 		for i in range(n_blocks):
-			self.resnet_blocks.append(nn.DataParallel(resnet_block(ngf * 4, 3, 1, 1)))
-			self.resnet_blocks[i].weight_init(0, 0.02)
+			a = nn.DataParallel(resnet_block(ngf * 4, 3, 1, 1))
+			a.weight_init(0, 0.02)
+			self.resnet_blocks.append(a)
 
 		self.resnet_blocks = nn.Sequential(*self.resnet_blocks)
 
