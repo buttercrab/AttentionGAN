@@ -390,16 +390,16 @@ class ResnetGenerator_our(nn.Module):
 		self.output_nc = output_nc
 		self.ngf = ngf
 		self.nb = n_blocks
-		self.conv1 = nn.Conv2d(input_nc, ngf, 7, 1, 0)
-		self.conv1_norm = nn.InstanceNorm2d(ngf)
-		self.conv2 = nn.Conv2d(ngf, ngf * 2, 3, 2, 1)
-		self.conv2_norm = nn.InstanceNorm2d(ngf * 2)
-		self.conv3 = nn.Conv2d(ngf * 2, ngf * 4, 3, 2, 1)
-		self.conv3_norm = nn.InstanceNorm2d(ngf * 4)
+		self.conv1 = nn.DataParallel(nn.Conv2d(input_nc, ngf, 7, 1, 0))
+		self.conv1_norm = nn.DataParallel(nn.InstanceNorm2d(ngf))
+		self.conv2 = nn.DataParallel(nn.Conv2d(ngf, ngf * 2, 3, 2, 1))
+		self.conv2_norm = nn.DataParallel(nn.InstanceNorm2d(ngf * 2))
+		self.conv3 = nn.DataParallel(nn.Conv2d(ngf * 2, ngf * 4, 3, 2, 1))
+		self.conv3_norm = nn.DataParallel(nn.InstanceNorm2d(ngf * 4))
 
 		self.resnet_blocks = []
 		for i in range(n_blocks):
-			self.resnet_blocks.append(resnet_block(ngf * 4, 3, 1, 1))
+			self.resnet_blocks.append(nn.DataParallel(resnet_block(ngf * 4, 3, 1, 1)))
 			self.resnet_blocks[i].weight_init(0, 0.02)
 
 		self.resnet_blocks = nn.Sequential(*self.resnet_blocks)
@@ -423,17 +423,17 @@ class ResnetGenerator_our(nn.Module):
 		# self.resnet_blocks9 = resnet_block(256, 3, 1, 1)
 		# self.resnet_blocks9.weight_init(0, 0.02)
 
-		self.deconv1_content = nn.ConvTranspose2d(ngf * 4, ngf * 2, 3, 2, 1, 1)
-		self.deconv1_norm_content = nn.InstanceNorm2d(ngf * 2)
-		self.deconv2_content = nn.ConvTranspose2d(ngf * 2, ngf, 3, 2, 1, 1)
-		self.deconv2_norm_content = nn.InstanceNorm2d(ngf)
-		self.deconv3_content = nn.Conv2d(ngf, 27, 7, 1, 0)
+		self.deconv1_content = nn.DataParallel(nn.ConvTranspose2d(ngf * 4, ngf * 2, 3, 2, 1, 1))
+		self.deconv1_norm_content = nn.DataParallel(nn.InstanceNorm2d(ngf * 2))
+		self.deconv2_content = nn.DataParallel(nn.ConvTranspose2d(ngf * 2, ngf, 3, 2, 1, 1))
+		self.deconv2_norm_content = nn.DataParallel(nn.InstanceNorm2d(ngf))
+		self.deconv3_content = nn.DataParallel(nn.Conv2d(ngf, 27, 7, 1, 0))
 
-		self.deconv1_attention = nn.ConvTranspose2d(ngf * 4, ngf * 2, 3, 2, 1, 1)
-		self.deconv1_norm_attention = nn.InstanceNorm2d(ngf * 2)
-		self.deconv2_attention = nn.ConvTranspose2d(ngf * 2, ngf, 3, 2, 1, 1)
-		self.deconv2_norm_attention = nn.InstanceNorm2d(ngf)
-		self.deconv3_attention = nn.Conv2d(ngf, 10, 1, 1, 0)
+		self.deconv1_attention = nn.DataParallel(nn.ConvTranspose2d(ngf * 4, ngf * 2, 3, 2, 1, 1))
+		self.deconv1_norm_attention = nn.DataParallel(nn.InstanceNorm2d(ngf * 2))
+		self.deconv2_attention = nn.DataParallel(nn.ConvTranspose2d(ngf * 2, ngf, 3, 2, 1, 1))
+		self.deconv2_norm_attention = nn.DataParallel(nn.InstanceNorm2d(ngf))
+		self.deconv3_attention = nn.DataParallel(nn.Conv2d(ngf, 10, 1, 1, 0))
 
 		self.tanh = torch.nn.Tanh()
 
