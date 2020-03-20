@@ -749,19 +749,19 @@ class NLayerDiscriminator(nn.Module):
 		for n in range(1, n_layers):  # gradually increase the number of filters
 			nf_mult_prev = nf_mult
 			nf_mult = min(2 ** n, 8)
-			sequence += map(nn.DataParallel, [
-				nn.Conv2d(ndf * nf_mult_prev, ndf * nf_mult, kernel_size=kw, stride=2, padding=padw, bias=use_bias),
-				norm_layer(ndf * nf_mult),
+			sequence += [
+				nn.DataParallel(nn.Conv2d(ndf * nf_mult_prev, ndf * nf_mult, kernel_size=kw, stride=2, padding=padw, bias=use_bias)),
+				nn.DataParallel(norm_layer(ndf * nf_mult)),
 				nn.LeakyReLU(0.2, True)
-			])
+			]
 
 		nf_mult_prev = nf_mult
 		nf_mult = min(2 ** n_layers, 8)
-		sequence += map(nn.DataParallel, [
-			nn.Conv2d(ndf * nf_mult_prev, ndf * nf_mult, kernel_size=kw, stride=1, padding=padw, bias=use_bias),
-			norm_layer(ndf * nf_mult),
+		sequence += [
+			nn.DataParallel(nn.Conv2d(ndf * nf_mult_prev, ndf * nf_mult, kernel_size=kw, stride=1, padding=padw, bias=use_bias)),
+			nn.DataParallel(norm_layer(ndf * nf_mult)),
 			nn.LeakyReLU(0.2, True)
-		])
+		]
 
 		sequence += map(nn.DataParallel, [nn.Conv2d(ndf * nf_mult, 1, kernel_size=kw, stride=1, padding=padw)])  # output 1 channel prediction map
 		self.model = nn.Sequential(*sequence)
